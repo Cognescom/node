@@ -1,16 +1,27 @@
 {
-  "name": "module_2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.1",
-    "joi": "^14.3.1",
-    "mysql": "^2.17.1"
-  }
+    "name": "module_2",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "eslint": "node_modules/.bin/eslint src/",
+        "dev:start": "nodemon --exec babel-node src/app.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.17.1",
+        "joi": "^14.3.1",
+        "mysql2": "^2.1.0",
+        "sequelize": "^5.21.3"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.7.7",
+        "@babel/node": "^7.7.7",
+        "@babel/preset-env": "^7.6.3",
+        "babel-loader": "^8.0.6",
+        "babel-eslint": "^8.2.6",
+        "eslint": "^4.19.1"
+    }
 }
