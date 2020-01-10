@@ -14,15 +14,41 @@ class Service {
     get(id) {
         return this.model.findByPk(id);
     }
-    insert(login, password, age) {
+    insert(data) {
+        const { login, password, age } = data;
         return this.model.create({
             login: login,
             password: password,
             age: age
         });
     }
-    update() {}
-    delete() {}
+    update(id, data) {
+        const { login, password, age } = data;
+        return this.model.update(
+            {
+                login: login,
+                password: password,
+                age: age
+            },
+            {
+                where: {
+                    id: id
+                }
+            }
+        );
+    }
+    delete(id) {
+        return this.model.update(
+            {
+                isDeleted: true
+            },
+            {
+                where: {
+                    id: id
+                }
+            }
+        );
+    }
 
     getUserByLogin(login) {
         return this.model.findOne({

@@ -1,5 +1,6 @@
-import Service from '../services/Service';
-import Users from '../models/Users';
+import Service from './../services/Service';
+import Users from './../models/Users';
+import ErrorHandler from './../exception/ErrorHandler';
 
 const apiService = new Service(Users);
 
@@ -39,31 +40,84 @@ class Controller {
             });
     }
     insert(req, resp) {
-        const { login, password, age } = req.body;
-        this.service.getUserByLogin(login)
+        this.service
+            .getUserByLogin(req.body.login)
             .then(user => {
                 if (user !== null) {
                     resp.status(400).send(
-                        `User with login: ${login} alredy exist!`
+                        `User with login: ${req.body.login} alredy exist!`
                     );
                 } else {
-                    return this.service.insert(login, password, age);
+                    return this.service.insert(req.body);
                 }
             })
-            .then(addedUser => {
-                console.log(`user add: ${addedUser}`); //! TODO
-                if (addedUser !== null) {
-                    resp.status(200).send('User added successfully');
-                } else {
-                    throw new Error("Can't add user to DB");
-                }
+            .then(() => {
+                resp.status(200).send('User added successfully');
             })
             .catch(error => {
                 resp.status(500).send(error.message);
             });
     }
-    update(req, resp) {}
-    delete(req, resp) {}
+    update(req, resp) {
+        const id = Number(req.params.id);
+        this.service
+            .get(id)
+            .then(user => {
+                if (user === null) {
+                    throw new ErrorHandler(
+                        400,
+                        `User with id: ${id} don't find`
+                    );
+                } else {
+                    return this.service.getUserByLogin(req.body.login);
+                }
+            })
+            .then(user => {
+                if (user !== null) {
+                    throw new ErrorHandler(
+                        400,
+                        `User with login: ${req.body.login} alredy exist`
+                    );
+                } else {
+                    return this.service.update(id, req.body);
+                }
+            })
+            .then(() => {
+                resp.status(200).send('User updated successfully');
+            })
+            .catch(error => {
+                if (error instanceof ErrorHandler) {
+                    resp.status(error.status).send(error.message);
+                } else {
+                    resp.send(500).send(error.message);
+                }
+            });
+    }
+    delete(req, resp) {
+        const id = Number(req.params.id);
+        this.service
+            .get(id)
+            .then(user => {
+                if (user === null) {
+                    throw new ErrorHandler(
+                        404,
+                        `User with id: ${id} don't find`
+                    );
+                } else {
+                    return this.service.delete(id);
+                }
+            })
+            .then(() => {
+                resp.status(200).send('User deleted succesfully');
+            })
+            .catch(error => {
+                if (error instanceof ErrorHandler) {
+                    resp.status(error.status).send(error.message);
+                } else {
+                    resp.status(500).send(error.message);
+                }
+            });
+    }
 }
 
 export default new Controller(apiService);
