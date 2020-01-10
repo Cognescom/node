@@ -1,8 +1,5 @@
 import Service from './../services/Service';
-import Users from './../models/Users';
 import ErrorHandler from './../exception/ErrorHandler';
-
-const apiService = new Service(Users);
 
 class Controller {
     constructor(service) {
@@ -18,7 +15,7 @@ class Controller {
         this.service
             .getAll()
             .then(users => {
-                resp.status(200).json(users.map(user => user.toJSON()));
+                resp.status(200).json(users);
             })
             .catch(error => {
                 resp.status(500).send(`Something went wrong: ${error.message}`);
@@ -29,59 +26,34 @@ class Controller {
         this.service
             .get(id)
             .then(user => {
-                if (user === null) {
-                    resp.status(404).send(`User with ${id} don't exist`);
-                } else {
-                    resp.status(200).json(JSON.parse(JSON.stringify(user)));
-                }
+                resp.status(200).json(JSON.parse(JSON.stringify(user)));
             })
             .catch(error => {
-                resp.status(500).send(error.message);
+                if (error instanceof ErrorHandler) {
+                    resp.status(error.status).send(error.message);
+                } else {
+                    resp.status(500).send(error.message);
+                }
             });
     }
     insert(req, resp) {
         this.service
-            .getUserByLogin(req.body.login)
-            .then(user => {
-                if (user !== null) {
-                    resp.status(400).send(
-                        `User with login: ${req.body.login} alredy exist!`
-                    );
-                } else {
-                    return this.service.insert(req.body);
-                }
-            })
+            .insert(req.body)
             .then(() => {
                 resp.status(200).send('User added successfully');
             })
             .catch(error => {
-                resp.status(500).send(error.message);
+                if (error instanceof ErrorHandler) {
+                    resp.status(error.status).send(error.message);
+                } else {
+                    resp.status(500).send(error.message);
+                }
             });
     }
     update(req, resp) {
         const id = Number(req.params.id);
         this.service
-            .get(id)
-            .then(user => {
-                if (user === null) {
-                    throw new ErrorHandler(
-                        400,
-                        `User with id: ${id} don't find`
-                    );
-                } else {
-                    return this.service.getUserByLogin(req.body.login);
-                }
-            })
-            .then(user => {
-                if (user !== null) {
-                    throw new ErrorHandler(
-                        400,
-                        `User with login: ${req.body.login} alredy exist`
-                    );
-                } else {
-                    return this.service.update(id, req.body);
-                }
-            })
+            .update(id, req.body)
             .then(() => {
                 resp.status(200).send('User updated successfully');
             })
@@ -96,17 +68,7 @@ class Controller {
     delete(req, resp) {
         const id = Number(req.params.id);
         this.service
-            .get(id)
-            .then(user => {
-                if (user === null) {
-                    throw new ErrorHandler(
-                        404,
-                        `User with id: ${id} don't find`
-                    );
-                } else {
-                    return this.service.delete(id);
-                }
-            })
+            .delete(id)
             .then(() => {
                 resp.status(200).send('User deleted succesfully');
             })
@@ -120,4 +82,4 @@ class Controller {
     }
 }
 
-export default new Controller(apiService);
+export default new Controller(Service);

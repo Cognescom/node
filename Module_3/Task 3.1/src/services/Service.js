@@ -1,62 +1,70 @@
-/* eslint-disable object-shorthand */
+import Data from './../data-access/DataAccess';
+import ErrorHandler from './../exception/ErrorHandler';
+
 class Service {
-    constructor(model) {
-        this.model = model;
+    constructor(store) {
+        this.store = store;
     }
 
     getAll() {
-        return this.model.findAll({
-            where: {
-                isDeleted: false
-            }
+        return this.store.getAll().then(users => {
+            return users.map(user => user.toJSON());
         });
     }
     get(id) {
-        return this.model.findByPk(id);
+        return this.store.get(id).then(user => {
+            if (user === null) {
+                throw new ErrorHandler(400, `User with ${id} don't exist`);
+            } else {
+                return user;
+            }
+        });
     }
     insert(data) {
-        const { login, password, age } = data;
-        return this.model.create({
-            login: login,
-            password: password,
-            age: age
+        return this.store.getUserByLogin(data.login).then(user => {
+            if (user !== null) {
+                throw new ErrorHandler(
+                    400,
+                    `User with login: ${data.login} alredy exist`
+                );
+            } else {
+                return this.store.insert(data);
+            }
         });
     }
     update(id, data) {
-        const { login, password, age } = data;
-        return this.model.update(
-            {
-                login: login,
-                password: password,
-                age: age
-            },
-            {
-                where: {
-                    id: id
+        return this.store
+            .get(id)
+            .then(user => {
+                if (user === null) {
+                    throw new ErrorHandler(
+                        400,
+                        `User with id: ${id} don't find`
+                    );
+                } else {
+                    return this.store.getUserByLogin(data.login);
                 }
-            }
-        );
+            })
+            .then(user => {
+                if (user !== null) {
+                    throw new ErrorHandler(
+                        400,
+                        `User with login: ${data.login} alredy exist`
+                    );
+                } else {
+                    return this.store.update(id, data);
+                }
+            });
     }
     delete(id) {
-        return this.model.update(
-            {
-                isDeleted: true
-            },
-            {
-                where: {
-                    id: id
-                }
-            }
-        );
-    }
-
-    getUserByLogin(login) {
-        return this.model.findOne({
-            where: {
-                login: login
+        return this.store.get(id).then(user => {
+            if (user === null) {
+                throw new ErrorHandler(404, `User with id: ${id} don't find`);
+            } else {
+                return this.store.delete(id);
             }
         });
     }
 }
 
-export default Service;
+export default new Service(Data);
