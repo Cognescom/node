@@ -1,7 +1,7 @@
-import Service from './../services/Service';
-import ErrorHandler from './../exception/ErrorHandler';
+import UserService from '../services/UserService';
+import ErrorHandler from '../exception/ErrorHandler';
 
-class Controller {
+class UserController {
     constructor(service) {
         this.service = service;
         this.getAll = this.getAll.bind(this);
@@ -82,4 +82,4 @@ class Controller {
     }
 }
 
-export default new Controller(Service);
+export default new UserController(UserService);
