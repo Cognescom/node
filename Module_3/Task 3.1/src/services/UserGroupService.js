@@ -6,6 +6,8 @@ class UserGroupService {
     }
     addUsersToGroup(groupId, userIds) {
         const data = [];
+        
+        
         for (let i = 0; i < userIds.length; i++) {
             if (!Array.isArray(userIds[i])) {
                 data.push({

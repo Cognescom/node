@@ -1,17 +1,14 @@
 import GroupService from './../services/GroupService';
-import UserGroupService from './../services/UserGroupService';
 import ErrorHandler from './../exception/ErrorHandler';
 
 class GroupController {
-    constructor(service, userGroupService) {
+    constructor(service) {
         this.service = service;
-        this.userGroupService = userGroupService;
         this.getAll = this.getAll.bind(this);
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.addUsers = this.addUsers.bind(this);
         this.addUsersToGroup = this.addUsersToGroup.bind(this);
     }
 
@@ -41,7 +38,6 @@ class GroupController {
             });
     }
     create(req, resp) {
-        console.log('CREATE');
         this.service
             .create(req.body.name)
             .then(() => {
@@ -89,24 +85,26 @@ class GroupController {
                 }
             });
     }
-    addUsers(req, resp) {
+    addUsersToGroup(req, resp) {
         const id = req.params.id;
         const data = req.body.usersIds;
-        this.addUsersToGroup(id, 12, 11, data)
+        this.service
+            .addUsersToGroup(id, data)
             .then(() => {
                 resp.status(200).send(
                     'Users added in group. Transaction complited'
                 );
             })
             .catch(error => {
-                resp.status(500).send(
-                    `Transaction has been rolled back: cause - ${error.message}`
-                );
+                if (error instanceof ErrorHandler) {
+                    resp.status(error.status).send(error.message);
+                } else {
+                    resp.status(500).send(
+                        `Transaction wasn't executed: cause - ${error.message}`
+                    );
+                }
             });
-    }
-    addUsersToGroup(groupId, ...usersIds) {
-        return this.userGroupService.addUsersToGroup(groupId, usersIds);
     }
 }
 
-export default new GroupController(GroupService, UserGroupService);
+export default new GroupController(GroupService);

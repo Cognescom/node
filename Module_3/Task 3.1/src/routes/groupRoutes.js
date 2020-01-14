@@ -6,5 +6,5 @@ export default router => {
     router.get('/groups/:id', GroupController.get);
     router.put('/groups/:id/update', GroupController.update);
     router.delete('/groups/:id/delete', GroupController.delete);
-    router.post('/groups/:id/addUsers', GroupController.addUsers);
+    router.post('/groups/:id/addUsers', GroupController.addUsersToGroup);
 };

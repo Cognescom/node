@@ -7,6 +7,8 @@ class UserGroupData {
     }
     create(data) {
         return db.sequelize.transaction(t => {
+            console.log('in transaction');
+
             return this.model.bulkCreate(data, {
                 transaction: t
             });
