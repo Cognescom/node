@@ -1,7 +1,7 @@
-import UsersData from './../data-access/UsersData';
+import Data from './../data-access/DataAccess';
 import ErrorHandler from './../exception/ErrorHandler';
 
-class UserService {
+class Service {
     constructor(store) {
         this.store = store;
     }
@@ -67,4 +67,4 @@ class UserService {
     }
 }
 
-export default new UserService(UsersData);
+export default new Service(Data);

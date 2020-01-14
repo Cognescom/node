@@ -1,6 +1,6 @@
-import Controller from '../controllers/UserController';
-import schema from '../config/validator';
-import validator from '../utils/validator';
+import Controller from './../controllers/Controller';
+import schema from './../config/validator';
+import validator from './../utils/validator';
 
 export default router => {
     router.get('/users', Controller.getAll);

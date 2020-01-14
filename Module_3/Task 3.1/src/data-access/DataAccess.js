@@ -1,7 +1,7 @@
 /* eslint-disable object-shorthand */
-import Users from '../models/Users';
+import Users from './../models/Users';
 
-class UsersData {
+class Data {
     constructor(model) {
         this.model = model;
     }
@@ -61,4 +61,4 @@ class UsersData {
     }
 }
 
-export default new UsersData(Users);
+export default new Data(Users);

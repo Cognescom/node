@@ -1,33 +1,32 @@
-import GroupService from './../services/GroupService';
+import Service from './../services/Service';
 import ErrorHandler from './../exception/ErrorHandler';
 
-class GroupController {
+class Controller {
     constructor(service) {
         this.service = service;
         this.getAll = this.getAll.bind(this);
         this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
+        this.insert = this.insert.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.addUsersToGroup = this.addUsersToGroup.bind(this);
     }
 
     getAll(req, resp) {
         this.service
             .getAll()
-            .then(groups => {
-                resp.status(200).json(groups);
+            .then(users => {
+                resp.status(200).json(users);
             })
             .catch(error => {
-                resp.status(500).send(error.message);
+                resp.status(500).send(`Something went wrong: ${error.message}`);
             });
     }
     get(req, resp) {
         const id = Number(req.params.id);
         this.service
             .get(id)
-            .then(group => {
-                resp.status(200).send(JSON.parse(JSON.stringify(group)));
+            .then(user => {
+                resp.status(200).json(JSON.parse(JSON.stringify(user)));
             })
             .catch(error => {
                 if (error instanceof ErrorHandler) {
@@ -37,13 +36,11 @@ class GroupController {
                 }
             });
     }
-    create(req, resp) {
+    insert(req, resp) {
         this.service
-            .create(req.body.name)
+            .insert(req.body)
             .then(() => {
-                resp.status(200).send(
-                    `Group with name: ${req.body.name} added successfully`
-                );
+                resp.status(200).send('User added successfully');
             })
             .catch(error => {
                 if (error instanceof ErrorHandler) {
@@ -56,15 +53,15 @@ class GroupController {
     update(req, resp) {
         const id = Number(req.params.id);
         this.service
-            .update(id, req.body.name)
+            .update(id, req.body)
             .then(() => {
-                resp.status(200).send('Group updated successfully');
+                resp.status(200).send('User updated successfully');
             })
             .catch(error => {
                 if (error instanceof ErrorHandler) {
                     resp.status(error.status).send(error.message);
                 } else {
-                    resp.status(500).send(error.message);
+                    resp.send(500).send(error.message);
                 }
             });
     }
@@ -73,9 +70,7 @@ class GroupController {
         this.service
             .delete(id)
             .then(() => {
-                resp.status(200).send(
-                    `Group with id: ${id} deleted succesfully`
-                );
+                resp.status(200).send('User deleted succesfully');
             })
             .catch(error => {
                 if (error instanceof ErrorHandler) {
@@ -85,26 +80,6 @@ class GroupController {
                 }
             });
     }
-    addUsersToGroup(req, resp) {
-        const id = req.params.id;
-        const data = req.body.usersIds;
-        this.service
-            .addUsersToGroup(id, data)
-            .then(() => {
-                resp.status(200).send(
-                    'Users added in group. Transaction complited'
-                );
-            })
-            .catch(error => {
-                if (error instanceof ErrorHandler) {
-                    resp.status(error.status).send(error.message);
-                } else {
-                    resp.status(500).send(
-                        `Transaction wasn't executed: cause - ${error.message}`
-                    );
-                }
-            });
-    }
 }
 
-export default new GroupController(GroupService);
+export default new Controller(Service);
